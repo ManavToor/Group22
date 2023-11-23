@@ -1,6 +1,7 @@
 const string MENU[4] = {"M&M's", "Sprinkles", "Gummy Worms", "Sour Candy"};
-//bool selected[4] = {false, false, false, false};
 const int COLOURS[4] = {colorRed, colorBlue, colorYellow, colorGreen};
+
+bool error = false;
 
 short COLOUR = S1;
 short ULTRASONIC = S2;
@@ -12,7 +13,7 @@ void displayMenu(string* menu_items, bool* selected)
 	displayTextLine(4, "Use Up/Down to navigate, right to select");
 
 	int counter = 0;
-	while(!getButtonPress(buttonEnter))
+	while(!getButtonPress(buttonEnter) && time1[T1] < 120000)
 	{
 		string topping = (string)menu_items[counter];
 		displayCenteredBigTextLine(8, topping);
@@ -81,27 +82,49 @@ void configureSensors()
 	wait1Msec(50);
 }
 
-void moveUntilColourDetected(int speed, int colour)
+void smoothStartStop(bool direction = true, int speed)
 {
-	for(int i = 0; i <= speed; i++)
+	if (direction)
 	{
-		motor[motorA]=motor[motorB]=i;
-		wait1Msec(100);
-	}
-	while(SensorValue[COLOUR] != colour)
-	{}
-	for(int i = speed; i >= 0; i--)
+		for(int i = 0; i <= speed; i++)
+		{
+			motor[motorA]=motor[motorB]=i;
+			wait1Msec(100);
+		}
+	} else
 	{
-		motor[motorA]=motor[motorB]=i;
-		wait1Msec(10);
+		for(int i = speed; i >= 0; i--)
+		{
+			motor[motorA]=motor[motorB]=i;
+			wait1Msec(10);
+		}
+		motor[motorA]=motor[motorB]=0;
 	}
+}
+
+void moveUntilColourDetected(int speed, int colour_index)
+{
+	smoothStartStop(true, speed);
+	while(SensorValue[COLOUR] != COLOURS[colour_index])
+	{
+		/*if (SensorValue[COLOUR] == COLOURS[colour_index+1] && colour_index != 4)
+		{
+			eraseDisplay();
+			displayBigTextLine(2, "Colour error");
+			displayBigTextLine(4, "%d", SensorValue[COLOUR]); // Debugging
+			wait1Msec(3000);
+			error = true;
+			break;
+		}*/
+	}
+	smoothStartStop(false, speed);
 	motor[motorA]=motor[motorB]=0;
 }
 
 void raiseArm()
 {
 	nMotorEncoder[motorC] = 0;
-	while(nMotorEncoder[motorC] > -3)
+	while(nMotorEncoder[motorC] > -75)
 	{
 		motor[motorC] = -3;
 	}
@@ -121,12 +144,11 @@ void dispenseToppings(bool* selected)
 	{
 		if(selected[i])
 		{
-			moveUntilColourDetected(10, COLOURS[i]);
+			moveUntilColourDetected(10, i);
 			wait1Msec(500);
 			raiseArm();
 		}
 	}
-
 	for(int i = 0; i <= 10; i++)
 	{
 		motor[motorA]=motor[motorB]=-i;
@@ -134,11 +156,7 @@ void dispenseToppings(bool* selected)
 	}
 	while(nMotorEncoder[motorB] > 0)
 	{}
-	for(int i = 10; i > 0; i--)
-	{
-		motor[motorA]=motor[motorB]=-i;
-		wait1Msec(10);
-	}
+	smoothStartStop(false, 10);
 	motor[motorA]=motor[motorB]=0;
 }
 
@@ -156,37 +174,49 @@ task main()
 	bool selected[4] = {false, false, false, false};
 
 	time1[T1] = 0;
-	while(time1[T1] < 120000)
+	while(time1[T1] < 120000 && error == false)
 	{
 		eraseDisplay();
+		displayString(8, "%d %d", SensorValue[COLOUR], time1[T1]); //DEBUG
 		configureSensors();
 		displayMenu(MENU, selected);
 		time1[T1] = 0;
-
+		//displayString(8, "%d %d", SensorValue[COLOUR], time1[T1]); //DEBUG
 		eraseDisplay();
 		displayCenteredBigTextLine(2, "Please place");
 		displayCenteredBigTextLine(4, "your cup");
-
-		bool detected = true;
+		//displayString(8, "%d %d", SensorValue[COLOUR], time1[T1]); //DEBUG
 		time1[T2] = 0;
 		while(SensorValue[ULTRASONIC] > 15)
 		{
 			if(time1[T2] > 30000)
 			{
-				detected = false;
+        eraseDisplay();
+				displayCenteredBigTextLine(2, "No cup error");
+				wait1Msec(3000);
+				error = true;
 			}
 		}
-		if (!detected)
-		{
-			continue;
-		}
-
+		//displayString(8, "%d %d", SensorValue[COLOUR], time1[T1]); //DEBUG
 		eraseDisplay();
 		displayCenteredBigTextLine(2, "Dispensing");
-
+		//displayString(8, "%d %d", SensorValue[COLOUR], time1[T1]); //DEBUG
 		dispenseToppings(selected);
 		playSound(soundUpwardTones);
 		reset(selected);
 		time1[T1] = 0;
 	}
+	if (error == true)
+	{
+		for(int i = 0; i <= 10; i++)
+	{
+		motor[motorA]=motor[motorB]=-i;
+		wait1Msec(100);
+	}
+	while(nMotorEncoder[motorB] > 0)
+	{}
+	smoothStartStop(false, 10);
+	motor[motorA]=motor[motorB]=0;
+	}
+	return;
 }
