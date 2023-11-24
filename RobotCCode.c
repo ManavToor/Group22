@@ -209,14 +209,14 @@ task main()
 	if (error == true)
 	{
 		for(int i = 0; i <= 10; i++)
-	{
-		motor[motorA]=motor[motorB]=-i;
-		wait1Msec(100);
-	}
-	while(nMotorEncoder[motorB] > 0)
-	{}
-	smoothStartStop(false, 10);
-	motor[motorA]=motor[motorB]=0;
+		{
+			motor[motorA]=motor[motorB]=-i;
+			wait1Msec(100);
+		}
+		while(nMotorEncoder[motorB] > 0)
+		{}
+		smoothStartStop(false, 10);
+		motor[motorA]=motor[motorB]=0;
 	}
 	return;
 }
