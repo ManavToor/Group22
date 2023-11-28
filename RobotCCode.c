@@ -171,6 +171,8 @@ bool* reset(bool* selected)
 
 task main()
 {
+	configureSensors();
+	
 	bool selected[4] = {false, false, false, false};
 
 	time1[T1] = 0;
@@ -178,7 +180,6 @@ task main()
 	{
 		eraseDisplay();
 		//displayString(8, "%d %d", SensorValue[COLOUR], time1[T1]); //DEBUG
-		configureSensors();
 		displayMenu(MENU, selected);
 		time1[T1] = 0;
 		//displayString(8, "%d %d", SensorValue[COLOUR], time1[T1]); //DEBUG
