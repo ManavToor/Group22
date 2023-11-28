@@ -3,8 +3,8 @@ const int COLOURS[4] = {colorRed, colorBlue, colorYellow, colorGreen};
 
 bool error = false;
 
-short COLOUR = S1;
-short ULTRASONIC = S2;
+const short COLOUR = S1;
+const short ULTRASONIC = S2;
 
 void displayMenu(string* menu_items, bool* selected)
 {
