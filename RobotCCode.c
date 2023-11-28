@@ -177,7 +177,7 @@ task main()
 	while(time1[T1] < 120000 && error == false)
 	{
 		eraseDisplay();
-		displayString(8, "%d %d", SensorValue[COLOUR], time1[T1]); //DEBUG
+		//displayString(8, "%d %d", SensorValue[COLOUR], time1[T1]); //DEBUG
 		configureSensors();
 		displayMenu(MENU, selected);
 		time1[T1] = 0;
