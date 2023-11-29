@@ -75,10 +75,10 @@ void displayMenu(string* menu_items, bool* selected)
 
 void configureSensors()
 {
-	SensorType[S2] = sensorEV3_Ultrasonic;
-	SensorType[S3] = sensorEV3_Color;
+	SensorType[ULTRASONIC] = sensorEV3_Ultrasonic;
+	SensorType[COLOUR] = sensorEV3_Color;
 	wait1Msec(50);
-	SensorMode[S3] = modeEV3Color_Color;
+	SensorMode[COLOUR] = modeEV3Color_Color;
 	wait1Msec(50);
 }
 
