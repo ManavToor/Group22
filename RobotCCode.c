@@ -107,7 +107,7 @@ void moveUntilColourDetected(int speed, int colour_index)
 	smoothStartStop(true, speed);
 	while(SensorValue[COLOUR] != COLOURS[colour_index])
 	{
-		if (SensorValue[COLOUR] == COLOURS[colour_index+1] && colour_index != 4)
+		if (SensorValue[COLOUR] == COLOURS[colour_index+1] && colour_index != 3)
 		{
 			eraseDisplay();
 			displayBigTextLine(2, "Colour error");
