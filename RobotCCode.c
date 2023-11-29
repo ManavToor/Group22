@@ -160,7 +160,11 @@ void dispenseToppings(bool* selected)
 	}
 	while(nMotorEncoder[motorB] > 0)
 	{}
-	smoothStartStop(false, 10);
+	for(int i = 10; i > 0; i--)
+	{
+		motor[motorA]=motor[motorB]=-i;
+		wait1Msec(100);
+	}
 	motor[motorA]=motor[motorB]=0;
 }
 
