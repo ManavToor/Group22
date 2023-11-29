@@ -107,7 +107,7 @@ void moveUntilColourDetected(int speed, int colour_index)
 	smoothStartStop(true, speed);
 	while(SensorValue[COLOUR] != COLOURS[colour_index])
 	{
-		/*if (SensorValue[COLOUR] == COLOURS[colour_index+1] && colour_index != 4)
+		if (SensorValue[COLOUR] == COLOURS[colour_index+1] && colour_index != 4)
 		{
 			eraseDisplay();
 			displayBigTextLine(2, "Colour error");
@@ -115,7 +115,7 @@ void moveUntilColourDetected(int speed, int colour_index)
 			wait1Msec(3000);
 			error = true;
 			break;
-		}*/
+		}
 	}
 	smoothStartStop(false, speed);
 	motor[motorA]=motor[motorB]=0;
@@ -145,6 +145,10 @@ void dispenseToppings(bool* selected)
 		if(selected[i])
 		{
 			moveUntilColourDetected(10, i);
+			if(error)
+			{
+				return;
+			}
 			wait1Msec(500);
 			raiseArm();
 		}
